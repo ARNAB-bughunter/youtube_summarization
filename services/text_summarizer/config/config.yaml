@@ -1,0 +1,7 @@
+rabbitmq:
+  host: localhost
+  port: 5672
+  user: guest
+  password: guest
+  input_queue: text_to_summary_queue
+  output_queue: summary_response_queue
