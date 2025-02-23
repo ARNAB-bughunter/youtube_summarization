@@ -13,10 +13,14 @@ Config.set_config()
 
 @contextmanager
 def rabbitmq_connection():
-    """Context manager for RabbitMQ connection."""
+
     connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host=Config.get_corpus("rabbitmq", "host"))
+        pika.ConnectionParameters(
+            host=Config.get_corpus("rabbitmq", "host"),
+            credentials=pika.PlainCredentials(Config.get_corpus("rabbitmq", "user"), Config.get_corpus("rabbitmq", "password"))
+        )
     )
+
     channel = connection.channel()
     try:
         yield channel
