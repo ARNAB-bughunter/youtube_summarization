@@ -45,7 +45,7 @@ if __name__ == "__main__":
     s_ = time.time()
     logger = setup_logger()
     
-    URLS = ['https://www.youtube.com/watch?v=Y8Tko2YC5hA']
+    URLS = ['https://www.youtube.com/watch?v=_dfLOzuIg2o']
     
     logger.info("Starting audio download...")
     audio_file = download_audio(URLS)
