@@ -17,6 +17,21 @@ services:
       retries: 5
       start_period: 30s
 
+  text_summarizer:
+    build:
+      context: ../services/text_summarizer/ 
+      dockerfile: Dockerfile
+    image: text_summarizer
+    container_name: text_summarizer
+    networks:
+      - default
+    volumes:
+      - /home/user/workspace/my_test/youtube_summarize/backend:/mnt/audio_files:rw
+      - /home/user/workspace/my_test/youtube_summarize/config_text_summarizer.yaml:/text_summarizer/config/config.yaml
+    depends_on:
+      rabbitmq-server:
+        condition: service_healthy
+
   audio_extraction_service:
     build:
       context: ../services/audio_extractor/ 
