@@ -27,7 +27,22 @@ services:
       - default
     volumes:
       - /home/user/workspace/my_test/youtube_summarize/backend:/mnt/audio_files:rw
-      - /home/user/workspace/my_test/youtube_summarize/config.yaml:/audio_extractor/config/config.yaml
+      - /home/user/workspace/my_test/youtube_summarize/config_audio_extractor.yaml:/audio_extractor/config/config.yaml
+    depends_on:
+      rabbitmq-server:
+        condition: service_healthy
+    
+  speech_to_text:
+    build:
+      context: ../services/speech_to_text/ 
+      dockerfile: Dockerfile
+    image: speech_to_text
+    container_name: speech_to_text
+    networks:
+      - default
+    volumes:
+      - /home/user/workspace/my_test/youtube_summarize/backend:/mnt/audio_files:rw
+      - /home/user/workspace/my_test/youtube_summarize/config_speech_to_text.yaml:/speech_to_text/config/config.yaml
     depends_on:
       rabbitmq-server:
         condition: service_healthy
