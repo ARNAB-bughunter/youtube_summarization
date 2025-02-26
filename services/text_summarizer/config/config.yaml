@@ -5,3 +5,4 @@ rabbitmq:
   password: guest
   input_queue: text_to_summary_queue
   output_queue: summary_response_queue
+  status_queue: status_queue

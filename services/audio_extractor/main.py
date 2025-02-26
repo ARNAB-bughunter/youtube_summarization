@@ -32,6 +32,7 @@ def setup_queues(channel):
     """Declare required queues."""
     channel.queue_declare(queue=Config.get_corpus("rabbitmq", "input_queue"), durable=True)
     channel.queue_declare(queue=Config.get_corpus("rabbitmq", "output_queue"), durable=True)
+    channel.queue_declare(queue=Config.get_corpus("rabbitmq", "status_queue"), durable=True)
 
 
 def callback(ch, method, properties, body):
@@ -43,6 +44,12 @@ def callback(ch, method, properties, body):
         if 'video_url' not in data or 'video_id' not in data:
             logging.error("Invalid message format. Missing required fields.")
             return
+
+        ch.basic_publish(
+            exchange='',
+            routing_key=Config.get_corpus("rabbitmq", "status_queue"),
+            body=json.dumps({"video_id": data['video_id'], "status": "Audio Extraction Starting......"})
+        )
 
         audio_path = download_audio(data['video_url'], data['video_id'])
         response_data = {

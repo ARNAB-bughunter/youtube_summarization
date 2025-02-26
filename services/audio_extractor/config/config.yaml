@@ -5,6 +5,7 @@ rabbitmq:
   password: guest
   input_queue: video_to_audio_queue
   output_queue: audio_to_text_queue
+  status_queue: status_queue
 
 folder_paths:
   backend_audio_file_path: /home/user/workspace/my_test/youtube_summarize/backend
