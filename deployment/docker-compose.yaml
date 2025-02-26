@@ -28,6 +28,12 @@ services:
     volumes:
       - /home/user/workspace/my_test/youtube_summarize/backend:/mnt/audio_files:rw
       - /home/user/workspace/my_test/youtube_summarize/config_text_summarizer.yaml:/text_summarizer/config/config.yaml
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list | grep -q llama3.2:1b"]
+      interval: 30s
+      timeout: 20s
+      retries: 10
+      start_period: 120s
     depends_on:
       rabbitmq-server:
         condition: service_healthy
@@ -46,6 +52,8 @@ services:
     depends_on:
       rabbitmq-server:
         condition: service_healthy
+      text_summarizer:
+        condition: service_healthy
     
   speech_to_text:
     build:
@@ -60,6 +68,8 @@ services:
       - /home/user/workspace/my_test/youtube_summarize/config_speech_to_text.yaml:/speech_to_text/config/config.yaml
     depends_on:
       rabbitmq-server:
+        condition: service_healthy
+      text_summarizer:
         condition: service_healthy
 
 networks:
