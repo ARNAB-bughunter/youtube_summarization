@@ -1,5 +1,5 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-import pika, json
+import pika, json, time
 from src.config import Config
 import asyncio
 
@@ -9,6 +9,10 @@ active_connections = {}
 async def broadcast_notification(message: str, msg_task_id: str):
     """Send a notification to all connected clients"""
     disconnected_clients = set()
+    # wait for active connection
+    while len(active_connections) <= 0:    
+        await asyncio.sleep(0.1)
+
     for task_id ,connection in active_connections.items():
         try:
             if task_id == msg_task_id:
@@ -30,6 +34,7 @@ def rabbitmq_consumer():
     def callback(ch, method, properties, body):
         message = json.loads(body.decode("utf-8"))
         msg_task_id, progress_msg = message['video_id'], message['status']  # Extract task_id from message
+        time.sleep(1)
         asyncio.run(broadcast_notification(progress_msg, msg_task_id))  # Send to WebSocket clients
         
     channel.basic_consume(queue=Config.get_corpus("rabbitmq", "status_queue"), on_message_callback=callback, auto_ack=True)
