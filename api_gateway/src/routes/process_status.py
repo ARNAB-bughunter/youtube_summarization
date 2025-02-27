@@ -35,9 +35,13 @@ def rabbitmq_consumer():
         message = json.loads(body.decode("utf-8"))
         msg_task_id, progress_msg = message['video_id'], message['status']  # Extract task_id from message
         time.sleep(1)
-        asyncio.run(broadcast_notification(progress_msg, msg_task_id))  # Send to WebSocket clients
+        if msg_task_id in active_connections:
+            asyncio.run(broadcast_notification(progress_msg, msg_task_id))  # Send to WebSocket clients
+            ch.basic_ack(method.delivery_tag)  # Acknowledge successful processing
+        else:
+            ch.basic_nack(method.delivery_tag, requeue=True)  # Requeue if client is offline
         
-    channel.basic_consume(queue=Config.get_corpus("rabbitmq", "status_queue"), on_message_callback=callback, auto_ack=True)
+    channel.basic_consume(queue=Config.get_corpus("rabbitmq", "status_queue"), on_message_callback=callback, auto_ack=False)
     
     try:
         channel.start_consuming()  # Keep consuming messages in a separate thread
