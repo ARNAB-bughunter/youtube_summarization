@@ -39,15 +39,14 @@ def callback(ch, method, properties, body):
         if 'video_id' not in data or 'transcribed_text' not in data:
             logging.error("Invalid message format. Missing required fields.")
             return
+        summary = summarize_text(data['transcribed_text'])
         
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "status": "Text Summarization Starting......"})
+            body=json.dumps({"video_id": data['video_id'], "status": "100"})
         )
-        
-        summary = summarize_text(data['transcribed_text'])
-                
+                        
         response_data = {
             "video_id": data['video_id'],
             "summary": summary

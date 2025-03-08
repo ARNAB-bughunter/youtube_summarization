@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 import pika
 from contextlib import contextmanager
 from src.config import Config
@@ -45,13 +46,13 @@ def callback(ch, method, properties, body):
             logging.error("Invalid message format. Missing required fields.")
             return
 
+        audio_path = download_audio(data['video_url'], data['video_id'])
+        time.sleep(0.5)
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "status": "Audio Extraction Starting......"})
+            body=json.dumps({"video_id": data['video_id'], "status": "30"})
         )
-
-        audio_path = download_audio(data['video_url'], data['video_id'])
         response_data = {
             "video_id": data['video_id'],
             "audio_file_path": audio_path

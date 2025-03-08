@@ -40,13 +40,13 @@ def callback(ch, method, properties, body):
             logging.error("Invalid message format. Missing required fields.")
             return
         
+        transcribed_text = transcribe_audio(data['audio_file_path'])
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "status": "Audio to Text Convertion Starting......"})
+            body=json.dumps({"video_id": data['video_id'], "status": "60"})
         )
         
-        transcribed_text = transcribe_audio(data['audio_file_path'])
                 
         response_data = {
             "video_id": data['video_id'],
