@@ -11,7 +11,7 @@ const formStyle = {
 
 const inputContainer = {
     position: "relative",
-    marginBottom: "20px"
+    marginBottom: "10px"
 };
 
 const inputStyle = {
@@ -73,21 +73,45 @@ const progressContainer = {
     height: "20px"
 };
 
+
+const textareaStyle = {
+    width: "100%",
+    background: "#e0e0e0",
+    borderRadius: "4px",
+    marginTop: "10px",
+    height: "150px",
+    resize: "none"
+}
+
+const textareaStyleURL = {
+    width: "100%",
+    background: "#e0e0e0",
+    borderRadius: "4px",
+    marginTop: "10px",
+    height: "20px", // Increase height for better visibility
+    resize: "none",
+    whiteSpace: "nowrap", // Prevents wrapping
+    overflow: "hidden", // Hides overflow text
+    textOverflow: "ellipsis" // Adds "..." if text overflows
+};
+
 const progressBar = (progress) => ({
     width: `${progress}%`,
     height: "100%",
-    background: "#28a745",
+    background: "repeating-linear-gradient(-45deg, #4CAF50, #4CAF50 10px, #66BB6A 10px, #66BB6A 20px)",
     borderRadius: "4px",
-    transition: "width 0.3s ease-in-out"
+    transition: "width 0.3s ease-in-out",
+    animation: "moveStripe 1s linear infinite"
 });
+
+
 
 const UrlForm = () => {
     const [isFocused, setIsFocused] = useState(false);
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState("");
-    const [progress, setProgress] = useState(0);
-    const [taskId, setTaskId] = useState(null);
+    const [progress, setProgress] = useState(0); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -119,9 +143,8 @@ const UrlForm = () => {
 
             const data = await response.json();
 
-            
+
             if (data.video_id) {
-                setTaskId(data.video_id);
                 listenForProgress(data.video_id); // Start WebSocket for progress updates
             }
         } catch (error) {
@@ -134,19 +157,19 @@ const UrlForm = () => {
     const listenForProgress = (taskId) => {
         const ws = new WebSocket(`ws://localhost:8000/ws/status/${taskId}`);
         console.log("WebSocket created");
-        
+
 
         ws.onmessage = (event) => {
             try {
                 const data = JSON.parse(event.data); // Parse JSON string into an object
 
                 console.log('data', data);
-        
+
                 let progress = Number(data.progress); // Convert progress to a number
                 console.log("WebSocket message:", progress);
-        
+
                 setProgress(progress);
-        
+
                 if (progress === 100) {
                     ws.close();
                     setSummary(data.summary || "Summary is ready.");
@@ -168,13 +191,20 @@ const UrlForm = () => {
         };
     };
 
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(summary)
+            .then(() => alert("Summary Copied to clipboard!"))
+            .catch(err => console.error("Failed to copy:", err));
+    };
+
     return (
         <>
             <div>
                 <h1>YouTube Video Summarizer</h1>
             </div>
-            <div>
-                <form style={formStyle} onSubmit={handleSubmit}>
+            <div style={formStyle}>
+                <form onSubmit={handleSubmit}>
                     <div style={inputContainer}>
                         <label
                             htmlFor="url"
@@ -197,18 +227,26 @@ const UrlForm = () => {
                     <button type="submit" style={loading ? buttonStyleDisable : buttonStyleNormal} disabled={loading}>
                         {loading ? "Processing..." : "Summarize"}
                     </button>
-                    {loading && (
-                        <div style={progressContainer}>
-                            <div style={progressBar(progress)}></div>
-                        </div>
-                    )}
-                    {summary && (
-                        <div style={{ marginTop: "20px", padding: "10px", background: "#f8f9fa", borderRadius: "4px" }}>
-                            <h3>Summary:</h3>
-                            <p>{summary}</p>
-                        </div>
-                    )}
                 </form>
+                {loading && (
+                    <div style={progressContainer}>
+                        <div style={progressBar(progress)}></div>
+                    </div>
+                )}
+                {summary && (
+                    
+                    <div style={{ padding: "10px", background: "#f8f9fa", borderRadius: "4px" }}>
+                        
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+                            <p style={{fontWeight:"bold"}}>Summary:</p>
+                            <button style={{ fontSize: "10PX", cursor: "pointer" }} onClick={handleCopy}>
+                                COPY
+                            </button>
+                        </div>                       
+                        <textarea style={textareaStyle}>{summary}</textarea>
+
+                    </div>
+                )}
             </div>
         </>
     );

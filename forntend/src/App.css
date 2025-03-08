@@ -5,6 +5,11 @@
   /* text-align: center; */
 }
 
+@keyframes moveStripe {
+  from { background-position: 0 0; }
+  to { background-position: 40px 0; }
+}
+
 /* .logo {
   height: 6em;
   padding: 1.5em;
