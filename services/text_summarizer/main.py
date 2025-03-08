@@ -44,12 +44,13 @@ def callback(ch, method, properties, body):
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "progress": "100", "summary": summary})
+            body=json.dumps({"video_id": data['video_id'], "progress": "100", "summary": summary, "thumbnail_url": data['thumbnail_url']})
         )
                         
         response_data = {
             "video_id": data['video_id'],
-            "summary": summary
+            "summary": summary,
+            "thumbnail_url": data['thumbnail_url']
         }
 
         ch.basic_publish(

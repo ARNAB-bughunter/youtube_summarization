@@ -23,3 +23,14 @@ def download_audio(urls, video_id):
             return None
     
     return output_filename
+
+
+  
+def get_video_iframe(video_url):
+    with yt_dlp.YoutubeDL({}) as ydl:
+        info = ydl.extract_info(video_url, download=False)
+        video_id = info.get("id")
+        if video_id:
+            iframe_code = f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe>'
+            return iframe_code
+    return ""

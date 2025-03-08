@@ -4,7 +4,7 @@ import time
 import pika
 from contextlib import contextmanager
 from src.config import Config
-from src.extractor import download_audio
+from src.extractor import download_audio, get_video_iframe
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -50,18 +50,21 @@ def callback(ch, method, properties, body):
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "progress": "10", "summary": ""})
+            body=json.dumps({"video_id": data['video_id'], "progress": "10", "summary": "", "thumbnail_url": ""})
         )
 
         audio_path = download_audio(data['video_url'], data['video_id'])
+        thumbnail_url = get_video_iframe(data['video_url'])
+        
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "progress": "40", "summary": ""})
+            body=json.dumps({"video_id": data['video_id'], "progress": "40", "summary": "", "thumbnail_url": thumbnail_url})
         )
         response_data = {
             "video_id": data['video_id'],
-            "audio_file_path": audio_path
+            "audio_file_path": audio_path,
+            "thumbnail_url": thumbnail_url
         }
 
         ch.basic_publish(

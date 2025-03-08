@@ -4,10 +4,22 @@ const formStyle = {
     background: "white",
     padding: "20px",
     borderRadius: "8px",
-    boxShadow: "0 0 5px rgba(16, 65, 27, 1)",
-    width: "300px",
-    margin: "auto",
+    boxShadow: "0 0 10px rgba(126, 245, 66, 1)",
+    margin: "10px"
 };
+
+
+
+const summaryStyle = {
+    background: "white",
+    padding: "20px",
+    borderRadius: "8px",
+    boxShadow: "0 0 10px rgba(126, 245, 66, 1)",
+    margin: "10px"
+};
+
+
+
 
 const inputContainer = {
     position: "relative",
@@ -111,7 +123,8 @@ const UrlForm = () => {
     const [value, setValue] = useState("");
     const [loading, setLoading] = useState(false);
     const [summary, setSummary] = useState("");
-    const [progress, setProgress] = useState(0); 
+    const [progress, setProgress] = useState(0);
+    const [thumbnailURL, setThumbnailURL] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -123,6 +136,7 @@ const UrlForm = () => {
         setLoading(true);
         setSummary("");
         setProgress(0);
+        setThumbnailURL("");
 
         try {
             const encodedUrl = encodeURIComponent(value);
@@ -170,6 +184,10 @@ const UrlForm = () => {
 
                 setProgress(progress);
 
+                if (data.thumbnail_url) {
+                    setThumbnailURL(data.thumbnail_url);
+                }
+
                 if (progress === 100) {
                     ws.close();
                     setSummary(data.summary || "Summary is ready.");
@@ -201,7 +219,7 @@ const UrlForm = () => {
     return (
         <>
             <div>
-                <h1>YouTube Video Summarizer</h1>
+                <h1 style={{color:"#42f5cb",}}>YouTube Video Summarizer</h1>
             </div>
             <div style={formStyle}>
                 <form onSubmit={handleSubmit}>
@@ -229,12 +247,16 @@ const UrlForm = () => {
                     </button>
                 </form>
                 {loading && (
-                    <div style={progressContainer}>
-                        <div style={progressBar(progress)}></div>
-                    </div>
+                    <>
+                        <p>Please wait a moment...</p>
+                        <div style={progressContainer}>
+                            <div style={progressBar(progress)}></div>
+                        </div>
+                    </>
                 )}
+            </div>
                 {summary && (
-                    
+                <div style={summaryStyle}>
                     <div style={{ padding: "10px", background: "#f8f9fa", borderRadius: "4px" }}>
                         
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
@@ -244,10 +266,12 @@ const UrlForm = () => {
                             </button>
                         </div>                       
                         <textarea style={textareaStyle}>{summary}</textarea>
-
                     </div>
+                </div>
                 )}
-            </div>
+            {thumbnailURL && <div dangerouslySetInnerHTML={{ __html: thumbnailURL }} />}
+
+            {/* <div dangerouslySetInnerHTML={{ __html: youtubevideo }} /> */}
         </>
     );
 };
