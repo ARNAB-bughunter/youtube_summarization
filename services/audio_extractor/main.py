@@ -45,13 +45,19 @@ def callback(ch, method, properties, body):
         if 'video_url' not in data or 'video_id' not in data:
             logging.error("Invalid message format. Missing required fields.")
             return
-
-        audio_path = download_audio(data['video_url'], data['video_id'])
+        
         time.sleep(0.5)
         ch.basic_publish(
             exchange='',
             routing_key=Config.get_corpus("rabbitmq", "status_queue"),
-            body=json.dumps({"video_id": data['video_id'], "status": "30"})
+            body=json.dumps({"video_id": data['video_id'], "progress": "10", "summary": ""})
+        )
+
+        audio_path = download_audio(data['video_url'], data['video_id'])
+        ch.basic_publish(
+            exchange='',
+            routing_key=Config.get_corpus("rabbitmq", "status_queue"),
+            body=json.dumps({"video_id": data['video_id'], "progress": "40", "summary": ""})
         )
         response_data = {
             "video_id": data['video_id'],

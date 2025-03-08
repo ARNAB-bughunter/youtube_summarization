@@ -6,17 +6,19 @@ import asyncio
 router = APIRouter()
 active_connections = {}
 
-async def broadcast_notification(message: str, msg_task_id: str):
+async def broadcast_notification(progress: str, summary: str, msg_task_id: str):
     """Send a notification to all connected clients"""
     disconnected_clients = set()
     # wait for active connection
     while len(active_connections) <= 0:    
         await asyncio.sleep(0.1)
+    
+    final_message = json.dumps({"progress": progress, "summary": summary})
 
     for task_id ,connection in active_connections.items():
         try:
             if task_id == msg_task_id:
-                await connection.send_text(message)
+                await connection.send_text(final_message)
         except:
             disconnected_clients.add(connection)
     
@@ -33,10 +35,10 @@ def rabbitmq_consumer():
 
     def callback(ch, method, properties, body):
         message = json.loads(body.decode("utf-8"))
-        msg_task_id, progress_msg = message['video_id'], message['status']  # Extract task_id from message
+        msg_task_id, progress, summary = message['video_id'], message['progress'], message['summary']  # Extract task_id from message
         time.sleep(1)
         if msg_task_id in active_connections:
-            asyncio.run(broadcast_notification(progress_msg, msg_task_id))  # Send to WebSocket clients
+            asyncio.run(broadcast_notification(progress, summary, msg_task_id))  # Send to WebSocket clients
             ch.basic_ack(method.delivery_tag)  # Acknowledge successful processing
         else:
             ch.basic_nack(method.delivery_tag, requeue=True)  # Requeue if client is offline

@@ -4,9 +4,9 @@ const formStyle = {
     background: "white",
     padding: "20px",
     borderRadius: "8px",
-    boxShadow: "0 0 10px rgba(0, 0, 0, 0.1)",
+    boxShadow: "0 0 5px rgba(16, 65, 27, 1)",
     width: "300px",
-    margin: "auto"
+    margin: "auto",
 };
 
 const inputContainer = {
@@ -43,12 +43,23 @@ const labelFocused = {
     color: "#28a745"
 };
 
-const buttonStyle = {
+const buttonStyleNormal = {
     backgroundColor: "#28a745",
     color: "white",
     border: "none",
     padding: "10px",
     cursor: "pointer",
+    width: "100%",
+    fontSize: "16px",
+    borderRadius: "4px"
+};
+
+const buttonStyleDisable = {
+    backgroundColor: "#505050",
+    color: "white",
+    border: "none",
+    padding: "10px",
+    cursor: "not-allowed",
     width: "100%",
     fontSize: "16px",
     borderRadius: "4px"
@@ -126,15 +137,23 @@ const UrlForm = () => {
         
 
         ws.onmessage = (event) => {
-            const data = event.data;
-            let pogress = +data
-            console.log("WebSocket message:", pogress);
-            setProgress(data);
+            try {
+                const data = JSON.parse(event.data); // Parse JSON string into an object
 
-            if (pogress === 100) {
-                ws.close();
-                setSummary(data.summary || "Summary is ready.");
-                setLoading(false);
+                console.log('data', data);
+        
+                let progress = Number(data.progress); // Convert progress to a number
+                console.log("WebSocket message:", progress);
+        
+                setProgress(progress);
+        
+                if (progress === 100) {
+                    ws.close();
+                    setSummary(data.summary || "Summary is ready.");
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.error("Error parsing WebSocket message:", error);
             }
         };
 
@@ -152,7 +171,7 @@ const UrlForm = () => {
     return (
         <>
             <div>
-                <h1>YouTube Video Summary</h1>
+                <h1>YouTube Video Summarizer</h1>
             </div>
             <div>
                 <form style={formStyle} onSubmit={handleSubmit}>
@@ -175,7 +194,7 @@ const UrlForm = () => {
                             onChange={(e) => setValue(e.target.value)}
                         />
                     </div>
-                    <button type="submit" style={buttonStyle} disabled={loading}>
+                    <button type="submit" style={loading ? buttonStyleDisable : buttonStyleNormal} disabled={loading}>
                         {loading ? "Processing..." : "Summarize"}
                     </button>
                     {loading && (
