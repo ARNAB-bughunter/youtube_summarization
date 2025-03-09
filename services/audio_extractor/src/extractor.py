@@ -31,6 +31,6 @@ def get_video_iframe(video_url):
         info = ydl.extract_info(video_url, download=False)
         video_id = info.get("id")
         if video_id:
-            iframe_code = f'<iframe width="560" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe>'
+            iframe_code = f'<iframe width="300" height="315" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe>'
             return iframe_code
     return ""

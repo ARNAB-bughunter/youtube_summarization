@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown'
 
 const formStyle = {
     background: "white",
     padding: "20px",
     borderRadius: "8px",
     boxShadow: "0 0 10px rgba(126, 245, 66, 1)",
-    margin: "10px"
+    margin: "10px",
+    minWidth: "300px",
 };
 
 
@@ -15,7 +17,7 @@ const summaryStyle = {
     padding: "20px",
     borderRadius: "8px",
     boxShadow: "0 0 10px rgba(126, 245, 66, 1)",
-    margin: "10px"
+    margin: "10px",
 };
 
 
@@ -66,6 +68,16 @@ const buttonStyleNormal = {
     borderRadius: "4px"
 };
 
+const copyButtonStyle = {
+    backgroundColor: "#28a745",
+    color: "white",
+    border: "none",
+    padding: "10px",
+    cursor: "pointer",
+    fontSize: "10px",
+    borderRadius: "4px"
+};
+
 const buttonStyleDisable = {
     backgroundColor: "#505050",
     color: "white",
@@ -88,11 +100,10 @@ const progressContainer = {
 
 const textareaStyle = {
     width: "100%",
-    background: "#e0e0e0",
     borderRadius: "4px",
     marginTop: "10px",
-    height: "150px",
-    resize: "none"
+    resize: "none",
+    maxWidth: "300px"
 }
 
 const textareaStyleURL = {
@@ -256,20 +267,27 @@ const UrlForm = () => {
                 )}
             </div>
                 {summary && (
+                <>
                 <div style={summaryStyle}>
                     <div style={{ padding: "10px", background: "#f8f9fa", borderRadius: "4px" }}>
                         
                         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                            <p style={{fontWeight:"bold"}}>Summary:</p>
-                            <button style={{ fontSize: "10PX", cursor: "pointer" }} onClick={handleCopy}>
+                            <p style={{fontWeight:"bold"}}>Key Points</p>
+                            <button style={ copyButtonStyle } onClick={handleCopy}> 
                                 COPY
                             </button>
                         </div>                       
-                        <textarea style={textareaStyle}>{summary}</textarea>
+                        
+                            <div style={textareaStyle}>
+                                <ReactMarkdown>{summary}</ReactMarkdown>
+                            </div>
                     </div>
+                
                 </div>
+                <div>{thumbnailURL && <div style={summaryStyle} dangerouslySetInnerHTML={{ __html: thumbnailURL }} />}</div>
+                </>
                 )}
-            {thumbnailURL && <div dangerouslySetInnerHTML={{ __html: thumbnailURL }} />}
+            
 
             {/* <div dangerouslySetInnerHTML={{ __html: youtubevideo }} /> */}
         </>
