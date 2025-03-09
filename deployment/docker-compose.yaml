@@ -16,6 +16,23 @@ services:
       timeout: 10s
       retries: 5
       start_period: 30s
+  
+
+  api_gateway:
+    build:
+      context: ../api_gateway/ 
+      dockerfile: Dockerfile
+    image: api_gateway
+    container_name: api_gateway
+    networks:
+      - default
+    ports:
+      - "8000:8000"
+    volumes:
+      - /home/user/workspace/my_test/youtube_summarize/config_api_gateway.yaml:/api_gateway/config/config.yaml:rw
+    depends_on:
+      rabbitmq-server:
+        condition: service_healthy
 
   text_summarizer:
     build:
