@@ -1,10 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 import uuid
 import json
 from src.services.rabbitmq_service import send_to_queue
+from src.utils.middleware import rate_limitting
 
-
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(rate_limitting)])
 
 @router.post("/")
 async def process_video(youtube_url: str):
